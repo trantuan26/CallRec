@@ -103,39 +103,39 @@ public class RecRecyclerAdapter extends RecyclerView.Adapter<RecRecyclerAdapter.
             });
 
             if (imvPlay != null) {
+                if (player == null) {
+                    player = new Player(context.getFilesDir().getAbsoluteFile() + "/" + list.get(getAdapterPosition())) {
+                        @Override
+                        public void onPrepare() {
+
+                        }
+
+                        @Override
+                        public void onPlaying() {
+
+                        }
+
+                        @Override
+                        public void togglePlayPause() {
+                            if (this.isPlaying()) {
+                                pause();
+//                                        btnPlayPause.setImageResource(R.drawable.play_48);
+                            } else {
+                                start();
+//                                        btnPlayPause.setImageResource(R.drawable.pause_48);
+                            }
+                        }
+
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+
+                        }
+                    };
+                }
                 imvPlay.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         // Use abstract function
-                        if (player == null) {
-                            player = new Player(context.getFilesDir().getAbsoluteFile() + "/" + list.get(getAdapterPosition())) {
-                                @Override
-                                public void onPrepare() {
-
-                                }
-
-                                @Override
-                                public void onPlaying() {
-
-                                }
-
-                                @Override
-                                public void togglePlayPause() {
-                                    if (this.isPlaying()) {
-                                        pause();
-//                                        btnPlayPause.setImageResource(R.drawable.play_48);
-                                    } else {
-                                        start();
-//                                        btnPlayPause.setImageResource(R.drawable.pause_48);
-                                    }
-                                }
-
-                                @Override
-                                public void onCompletion(MediaPlayer mediaPlayer) {
-
-                                }
-                            };
-                        }
 
                         if (isPlaying) {
                             stopPlayer();

@@ -34,7 +34,7 @@ class RecFile extends File {
       for (int i = 0; i < a.size(); i++){
           Audio au = new Audio();
           au.setFileName(a.get(i));
-          au.setUri(context.getFilesDir().getAbsolutePath()+a.get(i));
+          au.setmUri(context.getFilesDir().getAbsolutePath()+a.get(i));
           t.add(au);
       }
 

@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -36,7 +37,9 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -135,7 +138,10 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
 
                 break;
             case R.id.btn_admin:
-                UploadFile();
+                //UploadFile();
+                Intent mainIntent = new Intent(getActivity(), ListAudioActivity.class);
+                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(mainIntent);
                 break;
         }
     }
@@ -148,7 +154,7 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
     private void UploadFile(){
         //cap nhat anh vao store
         List<String> aye = Arrays.asList(new File(getContext().getFilesDir().getAbsolutePath()).list());
-        final String filenam = aye.get(1);
+        final String filenam = aye.get(0);
         final Uri resultUri =  Uri.fromFile(new File(getContext().getFilesDir().getAbsolutePath()+"/"+filenam));
 
 
@@ -162,15 +168,23 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
                     final String downloadUrl = task.getResult().getDownloadUrl().toString();
                     Audio audio = new Audio(filenam,downloadUrl);
 
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("reccall").child(firebaseUserId);
-                    databaseReference.setValue(audio)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(getContext(), "update success", Toast.LENGTH_LONG).show();
-                                    Log.d("MainAc", "onSuccess: "+downloadUrl);
-                                }
-                            });
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("reccall").child(firebaseUserId).push();
+
+
+                    Map messageBody = new HashMap();
+                    messageBody.put("fileName",filenam);
+                    messageBody.put("mUri",downloadUrl);
+
+
+
+                    databaseReference.updateChildren(messageBody, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if(databaseError!=null){
+                                Log.d("TAG", "onComplete: databaseError");
+                            }
+                        }
+                    });
 
 
                 } else {

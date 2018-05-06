@@ -18,9 +18,7 @@ public abstract class Player extends MediaPlayer implements Runnable, MediaPlaye
             prepare();
             setOnCompletionListener(this);
             new Thread(this).start();
-            handler = new Handler() {
-
-            };
+            handler = new Handler();
             onPrepare();
         } catch (IOException e) {
             e.printStackTrace();

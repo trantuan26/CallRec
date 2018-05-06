@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -23,7 +24,9 @@ public class RecRecyclerAdapter extends RecyclerView.Adapter<RecRecyclerAdapter.
     private Context context;
     private Player player = null;
     private List<String> list;
-    private boolean isPlaying = false;
+    private int lastItem;
+    private ImageView lastImv;
+    private SeekBar lastSeekBar;
 
     public RecRecyclerAdapter(Context context, List<String> list) {
         this.context = context;
@@ -42,13 +45,6 @@ public class RecRecyclerAdapter extends RecyclerView.Adapter<RecRecyclerAdapter.
         viewItem = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.rec_item_l, parent, false);
         return new RecyclerViewHolder(viewItem);
-    }
-
-    public void stopPlayer() {
-        this.isPlaying = false;
-        player.stop();
-        player.release();
-        player = null;
     }
 
     @Override
@@ -86,12 +82,14 @@ public class RecRecyclerAdapter extends RecyclerView.Adapter<RecRecyclerAdapter.
     public class RecyclerViewHolder extends RecyclerView.ViewHolder {
         private TextView tvName;
         private ImageView imvPlay;
+        private SeekBar sbPlay;
 
         public RecyclerViewHolder(View itemView) {
             super(itemView);
 
             imvPlay = itemView.findViewById(R.id.btnPlay);
             tvName = itemView.findViewById(R.id.tvName);
+            sbPlay = itemView.findViewById(R.id.sbPlay);
 
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -107,43 +105,59 @@ public class RecRecyclerAdapter extends RecyclerView.Adapter<RecRecyclerAdapter.
                     @Override
                     public void onClick(View view) {
                         // Use abstract function
-                        if (player == null) {
+                        if ((player == null) || (player != null && getAdapterPosition() != lastItem)) {
+                            if (player != null){
+                                player.stop();
+                                player.release();
+                                player = null;
+                                lastImv.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+                                lastSeekBar.setVisibility(View.INVISIBLE);
+                            }
+
                             player = new Player(context.getFilesDir().getAbsoluteFile() + "/" + list.get(getAdapterPosition())) {
                                 @Override
-                                public void onPrepare() {
+                                public void onCompletion(MediaPlayer mediaPlayer) {
+                                    imvPlay.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+                                    sbPlay.setProgress(0);
+                                }
 
+                                @Override
+                                public void onPrepare() {
+                                    sbPlay.setVisibility(View.VISIBLE);
+                                    sbPlay.setProgress(0);
+                                    sbPlay.setMax(this.getDuration());
                                 }
 
                                 @Override
                                 public void onPlaying() {
-
-                                }
-
-                                @Override
-                                public void togglePlayPause() {
-                                    if (this.isPlaying()) {
-                                        pause();
-//                                        btnPlayPause.setImageResource(R.drawable.play_48);
-                                    } else {
-                                        start();
-//                                        btnPlayPause.setImageResource(R.drawable.pause_48);
+                                    if (this.getCurrentPosition() < this.getDuration() && this.isPlaying()) {
+                                        sbPlay.setProgress(this.getCurrentPosition());
                                     }
                                 }
 
                                 @Override
-                                public void onCompletion(MediaPlayer mediaPlayer) {
-
+                                public void togglePlayPause() {
+                                    if (player.isPlaying()) {
+                                        player.pause();
+                                        imvPlay.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+                                        Log.d("L_player psause", (player == null) + " ");
+                                    } else {
+                                        player.start();
+                                        imvPlay.setImageResource(R.drawable.ic_pause_circle_outline_black_24dp);
+                                        Log.d("L_player playing", (player == null) + " ");
+                                    }
                                 }
                             };
-                        }
-
-                        if (isPlaying) {
-                            stopPlayer();
-                        } else {
-                            Log.d("L_FileDir", context.getFilesDir().getAbsoluteFile() + "/" + list.get(getAdapterPosition()));
-
+                            imvPlay.setImageResource(R.drawable.ic_pause_circle_outline_black_24dp);
+                            lastItem = getAdapterPosition();
+                            lastImv = imvPlay;
+                            lastSeekBar = sbPlay;
                             player.start();
-                            isPlaying = true;
+                            Log.d("L_new player", (player == null) + " ");
+                        } else {
+                            if (getAdapterPosition() == lastItem) {
+                                player.togglePlayPause();
+                            }
                         }
                     }
                 });

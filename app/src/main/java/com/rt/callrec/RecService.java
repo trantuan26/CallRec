@@ -16,6 +16,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -185,14 +188,24 @@ public class RecService extends Service {
 
         private void startRecording(Context context, String callAction, String number) {
 
-            File path = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + PATH);
-            if (!path.exists()) {
-                path.mkdirs();
-            }
 
+
+//            File path = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + PATH);
             String fileName = number + "_"+ DateFormat.format(getString(R.string.date_time_format), new Date()) +
                     "_" + callAction + "_" + "." + "mp3";
-            recFile = new RecFile(context, path + "/" + RecFile.getDateCreate(fileName, null) + "/" + fileName);
+
+            File path = context.getFilesDir();
+            try {
+                File file = new File(path, fileName);
+                FileOutputStream fis = new FileOutputStream(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+
+
+            recFile = new RecFile(context, path + "/" + fileName);
+
             recFile.setFormat("mp3");
             recording = new Recording(recFile);
             recording.startRecCommunication(context);

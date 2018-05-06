@@ -11,4 +11,7 @@
     <string name="phut_truoc">" phút trước, "</string>
     <string name="gio_truoc">" giờ trước, "</string>
     <string name="date_time_format">yyyy-MM-dd_kk-mm-ss</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

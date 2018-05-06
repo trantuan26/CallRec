@@ -43,6 +43,10 @@ public class MainAc extends AppCompatActivity {
                             .commit();
                     return true;
                 case R.id.muit_Infor:
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.flContent, new AccountsFragment())
+                            .commit();
                     return true;
             }
             return false;

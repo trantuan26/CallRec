@@ -28,7 +28,7 @@ class RecFile extends File {
         this.name = name;
     }
 
-    public static ArrayList<Audio> getListFileName(Context context) {
+    public static ArrayList<Audio> getListFileNameRua(Context context) {
         ArrayList<Audio> t = new ArrayList<>();
       List<String> a = Arrays.asList(new File(context.getFilesDir().getAbsolutePath()).list());
       for (int i = 0; i < a.size(); i++){
@@ -39,5 +39,9 @@ class RecFile extends File {
       }
 
         return t;
+    }
+
+    public static List<String> getListFileName(Context context) {
+        return Arrays.asList(new File(context.getFilesDir().getAbsolutePath()).list());
     }
 }

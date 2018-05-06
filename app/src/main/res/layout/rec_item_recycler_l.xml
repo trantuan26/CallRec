@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/loRecItemContent_recyclerView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="1dp"
+    android:paddingBottom="5dp">
+
+    <ImageView
+        android:id="@+id/imvCallAction"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imvItemContact"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_toRightOf="@+id/imvItemContact" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/imvItemContact"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@+id/imvItemContact"
+        android:textColor="@color/blue"
+        android:textSize="@dimen/sz2"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/tvTimeCreate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imvItemContact"
+        android:layout_marginBottom="5dp"
+        android:layout_toRightOf="@+id/imvCallAction" />
+
+    <TextView
+        android:id="@+id/tvLength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imvItemContact"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="10dp"
+        android:textColor="@color/red" />
+
+</RelativeLayout>

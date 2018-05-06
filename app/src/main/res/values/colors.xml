@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="top_line_setting_item">#d8dadd</color>
+    <color name="background">#e5e7eb</color>
+    <color name="background_2">#FFC107</color>
+    <color name="white">#FFF</color>
+    <color name="blue">#0000ff</color>
+    <color name="red">#ff0000</color>
+    <color name="toolbar_title_color">@color/white</color>
+    <color name="item_selected_color">#e2e9fc</color>
+    <color name="action_mode_color">@color/blue</color>
+    <color name="background_dark">#4f5052</color>
+    <color name="background_3">#152839</color>
+    <color name="black">#000</color>
+</resources>

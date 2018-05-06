@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:paddingBottom="5dp"
+        android:text="Nhat ky"
+        android:textColor="#FFF"
+        android:textSize="@dimen/sz2" />
+
+    <!--<ListView-->
+    <!--android:id="@+id/lvRecList"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:divider="@android:color/transparent"-->
+    <!--android:dividerHeight="1dp"/> -->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dividerHeight="0dp" />
+
+</LinearLayout>
+
+    <!--Note-->
+
+    <!--android:divider="@null" remove line between two item-->
+    <!--android:divider="@android:color/transparent" -->

@@ -20,21 +20,8 @@ public class Recording extends MediaRecorder {
     }
 
     public void startRecording() {
-        File dir = new File(recFile.getParent());
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-
-        switch (recFile.getFormat()) {
-            case "amr":
-                this.setOutputFormat(OutputFormat.AMR_NB);
-                this.setAudioEncoder(AudioEncoder.AMR_NB);
-                break;
-            case "mp3":
-                this.setOutputFormat(OutputFormat.AAC_ADTS);
-                this.setAudioEncoder(AudioEncoder.AAC);
-                break;
-        }
+        this.setOutputFormat(OutputFormat.AAC_ADTS);
+        this.setAudioEncoder(AudioEncoder.AAC);
 //        this.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 //        this.setAudioEncodingBitRate(64000);
         this.setOutputFile(recFile.getAbsolutePath());
@@ -57,18 +44,17 @@ public class Recording extends MediaRecorder {
     }
 
     public void startRecCommunication(Context context) {
-        int deviceCallVol;
-        AudioManager audioManager;
+//        int deviceCallVol;
+//        AudioManager audioManager;
 
 
-        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+//        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 //get the current volume set
-        deviceCallVol = audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL);
+//        deviceCallVol = audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL);
 //set volume to maximum
-        audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL), 0);
+//        audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL), 0);
 
-        this.setAudioSource(AudioSource.VOICE_COMMUNICATION);
-//        this.
+        this.setAudioSource(AudioSource.UNPROCESSED);
         this.setAudioChannels(2);
         this.startRecording();
     }

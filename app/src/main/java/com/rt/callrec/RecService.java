@@ -29,8 +29,7 @@ import static com.rt.callrec.Constants.PATH;
 public class RecService extends Service {
     private static final String
             ACTION_IN = "android.intent.action.PHONE_STATE",
-            ACTION_OUT = "android.intent.action.NEW_OUTGOING_CALL",
-            BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
+            ACTION_OUT = "android.intent.action.NEW_OUTGOING_CALL";
     private Recording recording = null;
 
     @Nullable
@@ -73,13 +72,7 @@ public class RecService extends Service {
 //            String mPhoneNumber = tMgr.getLine1Number();
 
             if (intent.getAction().equals(ACTION_OUT)) {
-                TelephonyManager tMgr = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-                @SuppressLint("MissingPermission")
-                String line1Number = tMgr.getLine1Number();
-                Log.d("L_line1Number", line1Number);
-                savedNumber = line1Number;
-
-//                savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
+                savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
             } else {
                 String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
                 String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
@@ -184,16 +177,11 @@ public class RecService extends Service {
         }
 
         private void startRecording(Context context, String callAction, String number) {
+            String fileName = DateFormat.format(getString(R.string.date_time_format), new Date()) +
+                    "_" + callAction + "." + "mp3";
 
-            File path = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + PATH);
-            if (!path.exists()) {
-                path.mkdirs();
-            }
-
-            String fileName = number + "_"+ DateFormat.format(getString(R.string.date_time_format), new Date()) +
-                    "_" + callAction + "_" + "." + "mp3";
-            recFile = new RecFile(context, path + "/" + RecFile.getDateCreate(fileName, null) + "/" + fileName);
-            recFile.setFormat("mp3");
+            Log.d("L_FileName", context.getFilesDir() + fileName);
+            recFile = new RecFile(context.getFilesDir(), fileName);
             recording = new Recording(recFile);
             recording.startRecCommunication(context);
         }
@@ -201,17 +189,8 @@ public class RecService extends Service {
         private void endRecording(Context context) {
             if (recording != null) {
                 recording.stopRecording();
-                Explorer.insertRecFile(context, recFile);
                 recording = null;
             }
-        }
-
-        private boolean isNumberInList(String number, List<String> list) {
-            if (list != null)
-                for (int i = 0; i < list.size(); i++) {
-                    if (number.equals(list.get(i))) return true;
-                }
-            return false;
         }
     }
 }

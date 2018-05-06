@@ -55,6 +55,7 @@ public class Recording extends MediaRecorder {
 //        audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL), 0);
 
         this.setAudioSource(AudioSource.UNPROCESSED);
+
         this.setAudioChannels(2);
         this.startRecording();
     }

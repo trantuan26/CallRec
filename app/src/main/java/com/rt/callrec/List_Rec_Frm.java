@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.rt.callrec.Constants.PATH;
 
 
@@ -20,27 +23,36 @@ import static com.rt.callrec.Constants.PATH;
 public class List_Rec_Frm extends Fragment {
     RecyclerView recyclerView;
     RecRecyclerAdapter adapter;
+    private ArrayList<Audio> audioList;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.rec_list_l, container, false);
 
+        audioList = new ArrayList<>();
+
         setHasOptionsMenu(true);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
-        adapter = new RecRecyclerAdapter(getContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + PATH);
-
+        adapter = new RecRecyclerAdapter(getContext(),audioList);
         recyclerView.setAdapter(adapter);
 
         return view;
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        audioList = RecFile.getListFileName(getContext());
+        adapter.ChangeList(audioList);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-
-        adapter.refresh();
+        audioList = RecFile.getListFileName(getContext());
+        adapter.ChangeList(audioList);
     }
 }

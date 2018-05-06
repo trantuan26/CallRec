@@ -12,19 +12,10 @@ import java.util.List;
 
 class RecFile extends File {
     String name;
-    boolean isPlaying = false;
 
     public RecFile(File pathname, String name) {
         super(pathname.getAbsolutePath(), name);
         this.name = name;
-    }
-
-    public boolean isPlaying() {
-        return isPlaying;
-    }
-
-    public void setPlaying(boolean playing) {
-        isPlaying = playing;
     }
 
     @NonNull
@@ -37,7 +28,16 @@ class RecFile extends File {
         this.name = name;
     }
 
-    public static List<String> getListFileName(Context context) {
-        return Arrays.asList(new File(context.getFilesDir().getAbsolutePath()).list());
+    public static ArrayList<Audio> getListFileName(Context context) {
+        ArrayList<Audio> t = new ArrayList<>();
+      List<String> a = Arrays.asList(new File(context.getFilesDir().getAbsolutePath()).list());
+      for (int i = 0; i < a.size(); i++){
+          Audio au = new Audio();
+          au.setFileName(a.get(i));
+          au.setUri(context.getFilesDir().getAbsolutePath()+a.get(i));
+          t.add(au);
+      }
+
+        return t;
     }
 }

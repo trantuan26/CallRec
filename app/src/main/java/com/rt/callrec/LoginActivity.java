@@ -2,6 +2,8 @@ package com.rt.callrec;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
@@ -41,9 +43,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileDescriptor;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -189,53 +201,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                                             startActivity(mainIntent);
                                             finish();
                                         }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    String mTokenUser = FirebaseInstanceId.getInstance().getToken();
-                                    String firebaseUserId = mAuth.getCurrentUser().getUid();
-                                    storeUserDefaultDataReference = FirebaseDatabase.getInstance()
-                                            .getReference()
-                                            .child("Users")
-                                            .child(firebaseUserId);
-                                    storeUserDefaultDataReference.child("user_name").setValue(user.getDisplayName());
-                                    storeUserDefaultDataReference.child("device_token").setValue(mTokenUser);
-                                    storeUserDefaultDataReference.child("user_status").setValue("Hi! I'm using Chat");
-                                    storeUserDefaultDataReference.child("user_image").setValue("ic_profile");
-                                    storeUserDefaultDataReference.child("user_thumb_image").setValue("default_iamge");
-                                    storeUserDefaultDataReference.addChildEventListener(new ChildEventListener() {
-                                        @Override
-                                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                            Intent mainIntent = new Intent(LoginActivity.this, MainAc.class);
-                                            mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                            startActivity(mainIntent);
-                                            finish();
-                                        }
-
-                                        @Override
-                                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                                        }
-
-                                        @Override
-                                        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                                        }
-
-                                        @Override
-                                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                            Toast.makeText(LoginActivity.this, "data add cancelled.",
-                                                    Toast.LENGTH_SHORT).show();
-                                        }
                                     });
-                                }
-                            });
-
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -277,4 +243,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
     }
+    
+
 }

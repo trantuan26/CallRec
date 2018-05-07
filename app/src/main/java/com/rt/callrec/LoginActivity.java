@@ -190,9 +190,20 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             final FirebaseUser user = mAuth.getCurrentUser();
-                            String onlineUserID = mAuth.getCurrentUser().getUid();
+                            String onlineUserID = user.getUid();
+                            String userName = user.getDisplayName();
+                            String userEmail = user.getEmail();
+                            String userPhone = user.getPhoneNumber();
+                            String userPhoto = String.valueOf(user.getPhotoUrl());
                             String mTokenUser = FirebaseInstanceId.getInstance().getToken();
-                            mDataRefUser.child(onlineUserID).child("device_token").setValue(mTokenUser)
+                            Map account = new HashMap();
+                            account.put("device_token",mTokenUser);
+                            account.put("uerID",onlineUserID);
+                            account.put("userName",userName);
+                            account.put("userEmail",userEmail);
+                            account.put("userPhone",userPhone);
+                            account.put("userPhoto",userPhoto);
+                            mDataRefUser.child(onlineUserID).setValue(account)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {

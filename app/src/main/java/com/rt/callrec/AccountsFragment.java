@@ -74,7 +74,7 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
 
         avatar = view.findViewById(R.id.profile_image);
         tvName = view.findViewById(R.id.tv_name);
-        tvEmail = view.findViewById(R.id.tv_name);
+        tvEmail = view.findViewById(R.id.tv_mail);
         btnSignOut = view.findViewById(R.id.btn_signout);
         btnAdmin = view.findViewById(R.id.btn_admin);
 
@@ -83,6 +83,7 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
 
         if (mAuth != null) {
             FirebaseUser User = mAuth.getCurrentUser();
+            if (User != null)
             SetUI(User);
         }
 
@@ -103,7 +104,7 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
                 .load(User.getPhotoUrl())
                 .into(avatar);
         tvName.setText(User.getDisplayName());
-        tvName.setText(User.getEmail());
+        tvEmail.setText(User.getEmail());
 
     }
 
@@ -138,9 +139,13 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
 
                 break;
             case R.id.btn_admin:
-                //UploadFile();
+//                List<String> aye = Arrays.asList(new File(getContext().getFilesDir().getAbsolutePath()).list());
+//                for (int i = 0; i < aye.size(); i++){
+//                    if(aye.get(i).split("mp3").length > 0) {
+//                        UploadFile(aye.get(i));
+//                    }
+//                }
                 Intent mainIntent = new Intent(getActivity(), ListAudioActivity.class);
-                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(mainIntent);
                 break;
         }
@@ -151,29 +156,29 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
 
     }
 
-    private void UploadFile(){
+    private void UploadFile(String filename){
         //cap nhat anh vao store
-        List<String> aye = Arrays.asList(new File(getContext().getFilesDir().getAbsolutePath()).list());
-        final String filenam = aye.get(0);
+
+        final String filenam = filename;
         final Uri resultUri =  Uri.fromFile(new File(getContext().getFilesDir().getAbsolutePath()+"/"+filenam));
 
 
         final String firebaseUserId = mAuth.getCurrentUser().getUid();
 
-        StorageReference mStorageRefImage  = FirebaseStorage.getInstance().getReference().child(firebaseUserId).child(filenam);
+        StorageReference mStorageRefImage  = FirebaseStorage.getInstance().getReference().child(filenam);
         mStorageRefImage.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
                 if (task.isSuccessful()) {
                     final String downloadUrl = task.getResult().getDownloadUrl().toString();
-                    Audio audio = new Audio(filenam,downloadUrl);
 
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("reccall").child(firebaseUserId).push();
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("reccall").push();
 
 
                     Map messageBody = new HashMap();
                     messageBody.put("fileName",filenam);
                     messageBody.put("mUri",downloadUrl);
+                    messageBody.put("userID",firebaseUserId);
 
 
 

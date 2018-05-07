@@ -20,6 +20,8 @@ import com.google.firebase.database.DatabaseError;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
+
 public class MusicService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener {
@@ -111,6 +113,7 @@ public class MusicService extends Service implements
         try{
 
             player.setDataSource(getApplicationContext(), Uri.parse(currSong));
+            Log.d(TAG, "playSong: " + currSong);
             player.setLooping(true);
         }
         catch(Exception e){

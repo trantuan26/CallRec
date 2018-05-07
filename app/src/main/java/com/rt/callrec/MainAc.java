@@ -104,6 +104,7 @@ public class MainAc extends AppCompatActivity {
                 , android.Manifest.permission.PROCESS_OUTGOING_CALLS
                 , android.Manifest.permission.WRITE_EXTERNAL_STORAGE
                 , Manifest.permission.RECEIVE_BOOT_COMPLETED
+
         };
         List<String> listPermissionsNeeded = new ArrayList<>();
 

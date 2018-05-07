@@ -1,5 +1,6 @@
 package com.rt.callrec;
 
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +30,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,6 +55,8 @@ public class ListAudioActivity extends AppCompatActivity
     private TextView mTextSeekto;
     private SeekBar mSeekbarAudio;
 
+    private ProgressDialog progressDialog;
+
     private Utilities utils;
 
     private AudioAdapter audioAdapter;
@@ -64,8 +68,10 @@ public class ListAudioActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_audio);
+
         recyclerView = findViewById(R.id.song_list);
-        listAudio = new ArrayList<>();
+        progressDialog = new ProgressDialog(this);
+
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("reccall");
         mDatabaseReference.keepSynced(true);
         mAuth = FirebaseAuth.getInstance();
@@ -74,12 +80,14 @@ public class ListAudioActivity extends AppCompatActivity
         initializeUI();
         initializeSeekbar();
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        audioAdapter = new AudioAdapter(listAudio, this, this);
-        recyclerView.setAdapter(audioAdapter);
+        if (listAudio == null) {
+            listAudio = new ArrayList<>();
+            audioAdapter = new AudioAdapter(listAudio, this, this);
+            recyclerView.setHasFixedSize(true);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(audioAdapter);
+        }
 
     }
 
@@ -126,25 +134,22 @@ public class ListAudioActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-
+        GetList();
         if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
             this.bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
         }
-        GetList();
-        audioAdapter.changeList(listAudio);
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        //if (playIntent == null)
+        if (playIntent == null)
         {
             playIntent = new Intent(this, MusicService.class);
             this.bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
         }
-        audioAdapter.changeList(listAudio);
+
     }
 
     private void resetTimemSeekbarAudio() {
@@ -346,40 +351,33 @@ public class ListAudioActivity extends AppCompatActivity
     };
 
 
-    @Override
-    public void onClick(Audio audio, int position) {
-
-        if (musicSrv != null) {
-            musicSrv.setSong(position);
-            musicSrv.playSong();
-            resetTimemSeekbarAudio();
-        }
-
-    }
-
-    @Override
-    public void onClickLong(Audio audio) {
-
-    }
-
-    private void GetList(){
-        listAudio.clear();
-        final String firebaseUserId = mAuth.getCurrentUser().getUid();
-        mDatabaseReference.child(firebaseUserId).addChildEventListener(new ChildEventListener() {
+    private void GetList() {
+        progressDialog.setTitle("List Recording");
+        progressDialog.setMessage("Please wait, is loading..");
+        progressDialog.show();
+        mDatabaseReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Audio audio  = dataSnapshot.getValue(Audio.class);
+                Audio audio = dataSnapshot.getValue(Audio.class);
                 //users.setUser_online(dataSnapshot.child("online").getValue().toString());
                 //Log.d("onChildAdded", "s: " + s);
-                //Log.d("onChildAdded", "dataSnapshot: " + dataSnapshot.getRef());
+                //Log.d("onChildAdded", "dataSnapshot: " + new Gson().toJson(audio));
                 //Log.d("onChildAdded", "dataSnapshot: " + dataSnapshot.getKey());
+                listAudio.add(0, audio);
+                audioAdapter.notifyItemInserted(0);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                    }
+                },600);
 
-                listAudio.add(audio);
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                if (progressDialog!=null)
+                    progressDialog.dismiss();
             }
 
             @Override
@@ -394,8 +392,32 @@ public class ListAudioActivity extends AppCompatActivity
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+               if (progressDialog!=null)
+                progressDialog.dismiss();
             }
         });
+
+    }
+
+    @Override
+    public void onClickAudio(Audio audio, int position) {
+        if (listAudio != null)
+            if (musicSrv != null) {
+//                if (isPlaying()) {
+//                    pause();
+//                } else
+                    {
+                    musicSrv.setSong(position);
+                    musicSrv.playSong();
+                    resetTimemSeekbarAudio();
+                }
+            }
+
+    }
+
+
+    @Override
+    public void onClickLongAudio(Audio audio, int position) {
+
     }
 }

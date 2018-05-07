@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:onClick="songPicked"
     android:orientation="vertical"
+    android:background="@android:color/white"
     android:padding="5dp" >
 
     <TextView
@@ -13,13 +13,17 @@
         android:layout_height="wrap_content"
         android:textColor="@android:color/holo_red_dark"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:text="aaa"
+        android:textStyle="bold"
+        />
 
     <TextView
         android:id="@+id/song_artist"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textColor="@android:color/holo_red_dark"
+        android:layout_below="@+id/song_title"
+        android:text="aaa"
         android:textSize="18sp" />
 
-</LinearLayout>
+</RelativeLayout>

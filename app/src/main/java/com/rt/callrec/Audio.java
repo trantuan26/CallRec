@@ -5,6 +5,7 @@ public class Audio {
     public String fileName;
    public String mUri;
    public String userID;
+   public String adminID;
    public String userName;
 
 
@@ -46,5 +47,14 @@ public class Audio {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+
+    public String getAdminID() {
+        return adminID;
+    }
+
+    public void setAdminID(String adminID) {
+        this.adminID = adminID;
     }
 }

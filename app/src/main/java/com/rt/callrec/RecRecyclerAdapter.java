@@ -17,6 +17,8 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
+import static com.rt.callrec.Constants.PATH;
+
 /**
  * Created by QNIT on 12/24/2016.
  */
@@ -116,7 +118,7 @@ public class RecRecyclerAdapter extends RecyclerView.Adapter<RecRecyclerAdapter.
                                 lastSeekBar.setVisibility(View.INVISIBLE);
                             }
 
-                            player = new Player(context.getFilesDir().getAbsoluteFile() + "/" + list.get(getAdapterPosition())) {
+                            player = new Player(context.getFilesDir().getAbsoluteFile() + PATH + "/" + list.get(getAdapterPosition())) {
                                 @Override
                                 public void onCompletion(MediaPlayer mediaPlayer) {
                                     imvPlay.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);

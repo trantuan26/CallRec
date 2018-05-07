@@ -5,6 +5,6 @@ package com.rt.callrec;
  */
 
 public class Constants {
-    public static final String PATH = "/VoiceRecorderSimplifiedCoding/Audios";
+    public static final String PATH = "/Audios/";
 
 }

@@ -83,10 +83,11 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
 
         if (mAuth != null) {
             FirebaseUser User = mAuth.getCurrentUser();
-            if (User != null)
-            SetUI(User);
-            if (User.getUid().equals("hxwTmdVFVkS9wuoF0FwLFssu2L13")){
-                btnAdmin.setVisibility(View.VISIBLE);
+            if (User != null) {
+                SetUI(User);
+                if (User.getUid().equals("hxwTmdVFVkS9wuoF0FwLFssu2L13")) {
+                    btnAdmin.setVisibility(View.VISIBLE);
+                }
             }
         }
 
@@ -134,7 +135,7 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
                             @Override
                             public void onResult(Status status) {
                                 Intent mainIntent = new Intent(getActivity(), LoginActivity.class);
-                                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(mainIntent);
                                 getActivity().finish();
                             }
@@ -157,46 +158,5 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-    }
-
-    private void UploadFile(String filename){
-        //cap nhat anh vao store
-
-        final String filenam = filename;
-        final Uri resultUri =  Uri.fromFile(new File(getContext().getFilesDir().getAbsolutePath()+"/"+filenam));
-
-
-        final String firebaseUserId = mAuth.getCurrentUser().getUid();
-
-        StorageReference mStorageRefImage  = FirebaseStorage.getInstance().getReference().child(filenam);
-        mStorageRefImage.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
-                if (task.isSuccessful()) {
-                    final String downloadUrl = task.getResult().getDownloadUrl().toString();
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("reccall").push();
-                    Map messageBody = new HashMap();
-                    messageBody.put("fileName",filenam);
-                    messageBody.put("mUri",downloadUrl);
-                    messageBody.put("userID",firebaseUserId);
-
-
-
-                    databaseReference.updateChildren(messageBody, new DatabaseReference.CompletionListener() {
-                        @Override
-                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                            if(databaseError!=null){
-                                Log.d("TAG", "onComplete: databaseError");
-                            }
-                        }
-                    });
-
-
-                } else {
-                    Toast.makeText(getContext(), "update picture faile", Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
     }
 }

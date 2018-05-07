@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -43,6 +44,7 @@ public class MainAc extends AppCompatActivity {
     private int RECORD_AUDIO_REQUEST_CODE = 12345;
     List_Rec_Frm list_rec_frm;
     private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -77,6 +79,8 @@ public class MainAc extends AppCompatActivity {
         }
 
         mAuth = FirebaseAuth.getInstance();
+
+        currentUser = mAuth.getCurrentUser();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -119,6 +123,22 @@ public class MainAc extends AppCompatActivity {
                     listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),
                     RECORD_AUDIO_REQUEST_CODE);
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (currentUser == null) {
+            mainLogout();
+        }
+    }
+
+    private void mainLogout() {
+        Intent startPageIntent = new Intent(MainAc.this, LoginActivity.class);
+        startPageIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(startPageIntent);
+        finish();
     }
 
     // Callback with the request from calling requestPermissions(...)

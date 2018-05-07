@@ -2,6 +2,7 @@ package com.rt.callrec;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -58,6 +59,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.rt.callrec.Constants.PATH;
+
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "LoginActivity";
@@ -70,6 +73,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private GoogleApiClient mGoogleApiClient;
     private final static int RC_SIGN_IN = 1987;
     private DatabaseReference storeUserDefaultDataReference;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
 
     @Override
@@ -79,10 +84,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         btnLogin = findViewById(R.id.btn_login_gl);
 
-
+        sharedPreferences = this.getSharedPreferences("RUA", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         mDataRefUser = FirebaseDatabase.getInstance().getReference().child("Users");
         mDataRefUser.keepSynced(true);
-
 
 
         // Configure Google Sign In
@@ -105,13 +110,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser User = firebaseAuth.getCurrentUser();
-                if (User != null){
+                if (User != null) {
                     // user signin
                     Intent mainIntent = new Intent(LoginActivity.this, MainAc.class);
-                    mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(mainIntent);
                     finish();
-                }else {
+                } else {
                     //User sign out
                 }
             }
@@ -137,7 +142,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void onStop() {
         super.onStop();
-        if (mAuthListener != null){
+        if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
@@ -154,21 +159,20 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult signInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (signInResult.isSuccess()){
+            if (signInResult.isSuccess()) {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = signInResult.getSignInAccount();
                 firebaseAuthWithGoogle(account);
-            }else{
+            } else {
                 //login that bai
             }
-        }
-        else if (requestCode == 0) {
+        } else if (requestCode == 0) {
             GoogleSignInResult signInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (signInResult.isSuccess()){
+            if (signInResult.isSuccess()) {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = signInResult.getSignInAccount();
                 firebaseAuthWithGoogle(account);
-            }else{
+            } else {
                 //login that bai
             }
         }
@@ -197,18 +201,28 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             String userPhoto = String.valueOf(user.getPhotoUrl());
                             String mTokenUser = FirebaseInstanceId.getInstance().getToken();
                             Map account = new HashMap();
-                            account.put("device_token",mTokenUser);
-                            account.put("uerID",onlineUserID);
-                            account.put("userName",userName);
-                            account.put("userEmail",userEmail);
-                            account.put("userPhone",userPhone);
-                            account.put("userPhoto",userPhoto);
+                            account.put("device_token", mTokenUser);
+                            account.put("uerID", onlineUserID);
+                            account.put("userName", userName);
+                            account.put("userEmail", userEmail);
+                            account.put("userPhone", userPhone);
+                            account.put("userPhoto", userPhoto);
+                            editor.putString("uerID", onlineUserID).commit();
+
+//                            File file = new File(LoginActivity.this.getFilesDir().getAbsolutePath() , "text.txt");
+//
+//                            try {
+//                                file.createNewFile();
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+
                             mDataRefUser.child(onlineUserID).setValue(account)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Intent mainIntent = new Intent(LoginActivity.this, MainAc.class);
-                                            mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                             startActivity(mainIntent);
                                             finish();
                                         }
@@ -226,23 +240,23 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-        Toast.makeText(this, "Google Play service erros",Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Google Play service erros", Toast.LENGTH_LONG).show();
     }
 
-    private void SignOunt(){
-        if (mAuth!=null)
-        mAuth.signOut();
+    private void SignOunt() {
+        if (mAuth != null)
+            mAuth.signOut();
         if (mGoogleApiClient.isConnected())
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
-            @Override
-            public void onResult(@NonNull Status status) {
-                //update lai giao dien
-            }
-        });
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+                @Override
+                public void onResult(@NonNull Status status) {
+                    //update lai giao dien
+                }
+            });
     }
 
 
-    private void revokeAccess(){
+    private void revokeAccess() {
         //sign out firebase
         mAuth.signOut();
 
@@ -254,6 +268,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
     }
-    
+
 
 }

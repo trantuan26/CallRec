@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -82,9 +83,7 @@ public class ListAudioActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(audioAdapter);
         }
-
     }
-
 
     @Override
     protected void onStart() {
@@ -112,6 +111,13 @@ public class ListAudioActivity extends AppCompatActivity {
         progressDialog.setMessage("Please wait, is loading..");
         progressDialog.show();
         listAudio.clear();
+        FirebaseUser user = mAuth.getCurrentUser();
+        String onlineUserID="";
+        if (user != null){
+            onlineUserID = user.getUid();
+        }
+
+        final String finalOnlineUserID = onlineUserID;
         mDatabaseReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -120,8 +126,11 @@ public class ListAudioActivity extends AppCompatActivity {
                 //Log.d("onChildAdded", "s: " + s);
                 //Log.d("onChildAdded", "dataSnapshot: " + new Gson().toJson(audio));
                 //Log.d("onChildAdded", "dataSnapshot: " + dataSnapshot.getKey());
-                listAudio.add(0, audio);
-                audioAdapter.ChangeList(listAudio);
+
+                if (finalOnlineUserID.equals(audio.getAdminID())){
+                    listAudio.add(0, audio);
+                    audioAdapter.ChangeList(listAudio);
+                }
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -153,7 +162,6 @@ public class ListAudioActivity extends AppCompatActivity {
                     progressDialog.dismiss();
             }
         });
-
     }
 
     private void ActionBar() {

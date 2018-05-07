@@ -2,10 +2,11 @@ package com.rt.callrec;
 
 import android.content.Context;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+
 import android.media.MediaPlayer;
+
 import android.support.v7.widget.RecyclerView;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,29 +19,34 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
 
-import de.hdodenhof.circleimageview.CircleImageView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+
+import java.util.ArrayList;
+
+import java.util.List;
+
 
 /**
  * Created by TRANTUAN on 09-Apr-18.
  */
 
-public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder>  implements Filterable {
+public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> implements Filterable {
 
     Context mContext;
     List<Audio> audioList;
     private List<Audio> audioListtFiltered;
-
+    private DatabaseReference mDataRefUser;
     private Player player = null;
     private int lastItem;
     private ImageView lastImv;
     private SeekBar lastSeekBar;
+    String name = "";
 
     public AudioAdapter(List<Audio> audioList, Context context) {
         this.mContext = context;
@@ -62,19 +68,36 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     }
 
 
-
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
         final Audio audio = audioListtFiltered.get(position);
-        if (audio!=null) {
+        if (audio != null) {
             viewHolder.tvName.setText(audio.getFileName());
-            viewHolder.song_artist.setText(audio.getUserID());
+            mDataRefUser = FirebaseDatabase.getInstance().getReference().child("Users");
+            mDataRefUser.keepSynced(true);
+
+            if (!TextUtils.isEmpty(audio.getUserID()))
+            mDataRefUser.child(audio.getUserID()).child("userName").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    //Log.d("aaa", "onBindViewHolder: " + snapshot.getValue());
+                    audio.setUserName(snapshot.getValue().toString());
+                    viewHolder.song_artist.setText(snapshot.getValue().toString());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+
+
         }
     }
 
+
     @Override
     public int getItemCount() {
-        return   audioListtFiltered == null ? 0 : audioListtFiltered.size();
+        return audioListtFiltered == null ? 0 : audioListtFiltered.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -106,7 +129,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
                     public void onClick(View view) {
                         // Use abstract function
                         if ((player == null) || (player != null && getAdapterPosition() != lastItem)) {
-                            if (player != null){
+                            if (player != null) {
                                 player.stop();
                                 player.release();
                                 player = null;
@@ -187,7 +210,9 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
-                        if (row.getFileName().toLowerCase().contains(charString.toLowerCase())
+                        if (
+                                row.getFileName().toLowerCase().contains(charString.toLowerCase())
+                                ||  row.getUserName().toLowerCase().contains(charString.toLowerCase())
                                 ) {
                             filteredList.add(row);
                         }

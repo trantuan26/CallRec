@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
 import com.google.gson.Gson;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class RecRecyclerAdapter extends RecyclerView.Adapter<RecRecyclerAdapter.
     private int lastItem;
     private ImageView lastImv;
     private SeekBar lastSeekBar;
+
 
     public RecRecyclerAdapter(Context context, List<String> list) {
         this.context = context;

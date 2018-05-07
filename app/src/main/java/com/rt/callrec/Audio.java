@@ -5,6 +5,7 @@ public class Audio {
     public String fileName;
    public String mUri;
    public String userID;
+   public String userName;
 
 
     public Audio() {
@@ -37,5 +38,13 @@ public class Audio {
 
     public void setmUri(String mUri) {
         this.mUri = mUri;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

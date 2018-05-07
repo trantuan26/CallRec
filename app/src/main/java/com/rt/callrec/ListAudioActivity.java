@@ -1,6 +1,7 @@
 package com.rt.callrec;
 
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -13,8 +14,12 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -38,8 +43,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class ListAudioActivity extends AppCompatActivity
-       {
+public class ListAudioActivity extends AppCompatActivity {
     private static final String TAG = "ListSongActivity";
     private List<Audio> listAudio;
     private RecyclerView recyclerView;
@@ -51,11 +55,11 @@ public class ListAudioActivity extends AppCompatActivity
     private ProgressDialog progressDialog;
 
 
-
     private AudioAdapter audioAdapter;
 
 
-    private LinearLayout ln_seekbar;
+    private Toolbar mToolbar;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +68,7 @@ public class ListAudioActivity extends AppCompatActivity
 
         recyclerView = findViewById(R.id.song_list);
         progressDialog = new ProgressDialog(this);
-
+        ActionBar();
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("reccall");
         mDatabaseReference.keepSynced(true);
         mAuth = FirebaseAuth.getInstance();
@@ -82,8 +86,6 @@ public class ListAudioActivity extends AppCompatActivity
     }
 
 
-
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -98,14 +100,11 @@ public class ListAudioActivity extends AppCompatActivity
     }
 
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         finish();
     }
-
-
 
 
     private void GetList() {
@@ -128,13 +127,13 @@ public class ListAudioActivity extends AppCompatActivity
                     public void run() {
                         progressDialog.dismiss();
                     }
-                },600);
+                }, 600);
 
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                if (progressDialog!=null)
+                if (progressDialog != null)
                     progressDialog.dismiss();
             }
 
@@ -150,12 +149,73 @@ public class ListAudioActivity extends AppCompatActivity
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-               if (progressDialog!=null)
-                progressDialog.dismiss();
+                if (progressDialog != null)
+                    progressDialog.dismiss();
             }
         });
 
     }
 
+    private void ActionBar() {
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
+        // toolbar fancy stuff
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("List Recording Audio");
+
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_search) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search_list, menu);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+     searchView = (SearchView) menu.findItem(R.id.action_search)
+                .getActionView();
+        searchView.setSearchableInfo(searchManager
+                .getSearchableInfo(getComponentName()));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
+        // listening to search query text change
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // filter recycler view when query submitted
+                audioAdapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                // filter recycler view when text is changed
+                audioAdapter.getFilter().filter(query);
+                return false;
+            }
+        });
+        return true;
+    }
 }

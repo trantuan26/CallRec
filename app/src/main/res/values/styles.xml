@@ -19,4 +19,13 @@
         <!--<item name="android:homeAsUpIndicator">@drawable/ic_arrow_back</item>-->
     </style>
 
+    <style name="SearchThem" parent="Widget.AppCompat.SearchView">
+        <!--This line changes the color of text in Toolbar-->
+        <item name="android:editTextColor">@color/white</item>
+        <item name="android:textColorHint">@color/white</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+        <item name="colorControlActivated">#65c3f2</item>
+    </style>
+
 </resources>

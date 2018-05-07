@@ -7,20 +7,25 @@
     android:orientation="vertical"
     tools:context=".ListAudioActivity">
 
-    <TextView
-        android:id="@+id/tv_title"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_red_dark"
-        android:text="List Recording Audio"
-        android:padding="16dp"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:gravity="center_vertical|center_horizontal"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/holo_red_light"
+            android:theme="@style/SearchThem"
+            app:popupTheme="@style/Theme.AppCompat.NoActionBar"
+            app:titleTextColor="@color/white"
+            app:subtitleTextColor="@color/white"
+            />
+
+
+    </android.support.design.widget.AppBarLayout>
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/song_list"

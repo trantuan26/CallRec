@@ -85,6 +85,9 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
             FirebaseUser User = mAuth.getCurrentUser();
             if (User != null)
             SetUI(User);
+            if (User.getUid().equals("hxwTmdVFVkS9wuoF0FwLFssu2L13")){
+                btnAdmin.setVisibility(View.VISIBLE);
+            }
         }
 
         btnSignOut.setOnClickListener(this);
@@ -98,7 +101,7 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
         tvName.setVisibility(View.VISIBLE);
         tvEmail.setVisibility(View.VISIBLE);
         btnSignOut.setVisibility(View.VISIBLE);
-        btnAdmin.setVisibility(View.VISIBLE);
+        btnAdmin.setVisibility(View.INVISIBLE);
 
         Picasso.with(getContext())
                 .load(User.getPhotoUrl())

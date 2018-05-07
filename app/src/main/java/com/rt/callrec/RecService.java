@@ -31,11 +31,14 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static com.rt.callrec.Constants.PATH;
 
@@ -206,7 +209,12 @@ public class RecService extends Service {
         }
 
         private void startRecording(Context context, String callAction, String number) {
-            String fileName = DateFormat.format(getString(R.string.date_time_format), new Date()) +
+
+            java.text.DateFormat formatter = new SimpleDateFormat(getString(R.string.date_time_format));
+            formatter.setTimeZone(TimeZone.getDefault());
+            long time = System.currentTimeMillis();
+
+            String fileName =  String.format(formatter.format(time)) +
                     "_" + callAction + "." + "mp3";
 
             File root = new File(context.getFilesDir().getAbsolutePath() + PATH);

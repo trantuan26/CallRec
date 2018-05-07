@@ -3,6 +3,7 @@ package com.rt.callrec;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -13,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.rt.callrec.Constants.PATH;
 
 
@@ -48,6 +51,9 @@ public class List_Rec_Frm extends Fragment {
     private Toolbar mToolbar;
     private SearchView searchView;
 
+    private SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,6 +61,8 @@ public class List_Rec_Frm extends Fragment {
 
         recyclerView = view.findViewById(R.id.song_list);
         progressDialog = new ProgressDialog(getActivity());
+        sharedPreferences = getActivity().getSharedPreferences("RUA", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         ActionBar(view);
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("reccall");
         mDatabaseReference.keepSynced(true);
@@ -81,81 +89,86 @@ public class List_Rec_Frm extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        GetList();
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//        finish();
-//    }
 
     private void GetList() {
         progressDialog.setTitle("List Recording");
         progressDialog.setMessage("Please wait, is loading..");
         progressDialog.show();
         listAudio.clear();
-        FirebaseUser user = mAuth.getCurrentUser();
-         String onlineUserID="";
-        if (user != null){
-            onlineUserID = user.getUid();
+
+        String firebaseUserId = "";
+
+        if (mAuth != null) {
+            FirebaseUser User = mAuth.getCurrentUser();
+            if (User != null) {
+                firebaseUserId = User.getUid().toString();
+            } else {
+                firebaseUserId = sharedPreferences.getString("uerID", "");
+            }
         }
 
-        final String finalOnlineUserID = onlineUserID;
+        final String finalFirebaseUserId = firebaseUserId;
         mDatabaseReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Audio audio = dataSnapshot.getValue(Audio.class);
-                //users.setUser_online(dataSnapshot.child("online").getValue().toString());
-                //Log.d("onChildAdded", "s: " + s);
-                //Log.d("onChildAdded", "dataSnapshot: " + new Gson().toJson(audio));
-                //Log.d("onChildAdded", "dataSnapshot: " + dataSnapshot.getKey());
-                if (finalOnlineUserID.equals(audio.getUserID())){
-                    listAudio.add(0, audio);
-                    audioAdapter.ChangeList(listAudio);
-                }
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressDialog.dismiss();
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Audio audio = dataSnapshot.getValue(Audio.class);
+                    //users.setUser_online(dataSnapshot.child("online").getValue().toString());
+                    //Log.d("onChildAdded", "s: " + s);
+                    //Log.d("onChildAdded", "dataSnapshot: " + new Gson().toJson(audio));
+                    //Log.d("onChildAdded", "dataSnapshot: " + dataSnapshot.getKey());
+                    Log.d("onChildAdded", "finalFirebaseUserId: " + finalFirebaseUserId);
+                    Log.d("onChildAdded", "getUserID: " + audio.getUserID());
+
+
+                    if (finalFirebaseUserId.equals(audio.getUserID()))
+                    {
+                        listAudio.add(0, audio);
+                        audioAdapter.ChangeList(listAudio);
+                        Log.d("onChildAdded", "getUserID: true" );
+                    }else {
+                        Log.d("onChildAdded", "getUserID: false" );
                     }
-                }, 600);
-            }
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (progressDialog.isShowing()){
+                                progressDialog.dismiss();
+                            }
+                        }
+                    }, 600);
+                }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                if (progressDialog != null)
-                    progressDialog.dismiss();
-            }
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    if (progressDialog != null)
+                        progressDialog.dismiss();
+                }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                if (progressDialog != null)
-                    progressDialog.dismiss();
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-    }
+                }
+            });
+        }
+
+
+
+
 
     private void ActionBar(View view) {
         mToolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
-//        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                onBackPressed();
-//            }
-//        });
-//
-//        // toolbar fancy stuff
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("List Recording Audio");
 
     }

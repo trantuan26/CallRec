@@ -171,10 +171,7 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
             public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
                 if (task.isSuccessful()) {
                     final String downloadUrl = task.getResult().getDownloadUrl().toString();
-
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("reccall").push();
-
-
                     Map messageBody = new HashMap();
                     messageBody.put("fileName",filenam);
                     messageBody.put("mUri",downloadUrl);

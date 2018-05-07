@@ -58,9 +58,7 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".MusicService"
-            android:enabled="true" />
+
 
         <activity
             android:name=".ListAudioActivity"

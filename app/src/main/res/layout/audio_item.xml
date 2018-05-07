@@ -3,27 +3,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@android:color/white"
-    android:padding="5dp" >
+    android:padding="5dp">
+
+    <ImageView
+        android:id="@+id/btnPlay"
+        app:srcCompat="@drawable/ic_play_circle_outline_black_24dp"
+        android:layout_width="@dimen/cimv_size"
+        android:layout_height="@dimen/cimv_size"
+        android:layout_margin="5dp"
+        android:scaleType="centerCrop"/>
 
     <TextView
-        android:id="@+id/song_title"
-        android:layout_width="fill_parent"
+        android:id="@+id/tvName"
+        android:text="Name"
+        android:layout_marginTop="15dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_red_dark"
-        android:textSize="20sp"
-        android:text="aaa"
-        android:textStyle="bold"
-        />
+        android:layout_marginBottom="5dp"
+        android:layout_toRightOf="@+id/btnPlay" />
 
     <TextView
         android:id="@+id/song_artist"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_red_dark"
-        android:layout_below="@+id/song_title"
-        android:text="aaa"
-        android:textSize="18sp" />
+        android:layout_below="@+id/tvName"
+        android:layout_toRightOf="@+id/btnPlay"
+        />
+
+    <SeekBar
+        android:id="@+id/sbPlay"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/song_artist"
+        android:layout_toRightOf="@+id/btnPlay" />
+
+
+
 
 </RelativeLayout>

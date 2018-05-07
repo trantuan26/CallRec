@@ -4,6 +4,7 @@ import android.content.Context;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -34,12 +36,14 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     Context mContext;
     List<Audio> audioList;
     private List<Audio> audioListtFiltered;
-    private AudioListener listener;
 
+    private Player player = null;
+    private int lastItem;
+    private ImageView lastImv;
+    private SeekBar lastSeekBar;
 
-    public AudioAdapter(List<Audio> audioList, Context context,  AudioListener listener) {
+    public AudioAdapter(List<Audio> audioList, Context context) {
         this.mContext = context;
-        this.listener = listener;
         this.audioList = audioList;
         this.audioListtFiltered = audioList;
     }
@@ -61,10 +65,9 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
-
         final Audio audio = audioListtFiltered.get(position);
         if (audio!=null) {
-            viewHolder.song_title.setText(audio.getFileName());
+            viewHolder.tvName.setText(audio.getFileName());
             viewHolder.song_artist.setText(audio.getUserID());
         }
     }
@@ -76,30 +79,97 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView song_title, song_artist;
+        TextView song_artist;
+        private TextView tvName;
+        private ImageView imvPlay;
+        private SeekBar sbPlay;
 
 
         public ViewHolder(View view) {
             super(view);
-            song_title = view.findViewById(R.id.song_title);
             song_artist = view.findViewById(R.id.song_artist);
-
-            view.setOnClickListener(new View.OnClickListener() {
+            imvPlay = itemView.findViewById(R.id.btnPlay);
+            tvName = itemView.findViewById(R.id.tvName);
+            sbPlay = itemView.findViewById(R.id.sbPlay);
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public void onClick(View view) {
-                    // send selected chatHistory in callback
-                    listener.onClickAudio(audioListtFiltered.get(getAdapterPosition()),getAdapterPosition());
-                }
-            });
-
-            view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    listener.onClickLongAudio(audioListtFiltered.get(getAdapterPosition()),getAdapterPosition());
+                public boolean onLongClick(View view) {
+                    // Use abstract function
+//                    onItemClick();
                     return true;
                 }
             });
 
+            if (imvPlay != null) {
+                imvPlay.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Use abstract function
+                        if ((player == null) || (player != null && getAdapterPosition() != lastItem)) {
+                            if (player != null){
+                                player.stop();
+                                player.release();
+                                player = null;
+                                lastImv.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+                                lastSeekBar.setVisibility(View.INVISIBLE);
+                            }
+
+                            player = new Player(audioListtFiltered.get(getAdapterPosition()).getmUri()) {
+                                @Override
+                                public void onCompletion(MediaPlayer mediaPlayer) {
+                                    imvPlay.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+                                    sbPlay.setProgress(0);
+                                }
+
+                                @Override
+                                public void onPrepare() {
+                                    sbPlay.setVisibility(View.VISIBLE);
+                                    sbPlay.setProgress(0);
+                                    sbPlay.setMax(this.getDuration());
+                                }
+
+                                @Override
+                                public void onPlaying() {
+                                    if (this.getCurrentPosition() < this.getDuration() && this.isPlaying()) {
+                                        sbPlay.setProgress(this.getCurrentPosition());
+                                    }
+                                }
+
+                                @Override
+                                public void togglePlayPause() {
+                                    if (player.isPlaying()) {
+                                        player.pause();
+                                        imvPlay.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+                                        Log.d("L_player psause", (player == null) + " ");
+                                    } else {
+                                        player.start();
+                                        imvPlay.setImageResource(R.drawable.ic_pause_circle_outline_black_24dp);
+                                        Log.d("L_player playing", (player == null) + " ");
+                                    }
+                                }
+                            };
+                            imvPlay.setImageResource(R.drawable.ic_pause_circle_outline_black_24dp);
+                            lastItem = getAdapterPosition();
+                            lastImv = imvPlay;
+                            lastSeekBar = sbPlay;
+                            player.start();
+                            Log.d("L_new player", (player == null) + " ");
+                        } else {
+                            if (getAdapterPosition() == lastItem) {
+                                player.togglePlayPause();
+                            }
+                        }
+                    }
+                });
+            }
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Use abstract function
+//                    onItemClick(getAdapterPosition());
+                }
+            });
         }
     }
 
@@ -139,8 +209,5 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         };
     }
 
-    public interface AudioListener {
-        void onClickAudio(Audio audio,int position);
-        void onClickLongAudio(Audio audio, int position);
-    }
+
 }

@@ -210,11 +210,7 @@ public class RecService extends Service {
 
         private void startRecording(Context context, String callAction, String number) {
 
-            java.text.DateFormat formatter = new SimpleDateFormat(getString(R.string.date_time_format));
-            formatter.setTimeZone(TimeZone.getDefault());
-            long time = System.currentTimeMillis();
-
-            String fileName =  String.format(formatter.format(time)) +
+            String fileName = DateFormat.format(getString(R.string.date_time_format), new Date()) +
                     "_" + callAction + "." + "mp3";
 
             File root = new File(context.getFilesDir().getAbsolutePath() + PATH);

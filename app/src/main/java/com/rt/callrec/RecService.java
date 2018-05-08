@@ -31,6 +31,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -101,10 +102,11 @@ public class RecService extends Service {
 //            String mPhoneNumber = tMgr.getLine1Number();
 
             if (intent.getAction().equals(ACTION_OUT)) {
-                savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
+//                savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
             } else {
                 String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
-                String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
+//                String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
+                String number = "";
                 int state = 0;
                 if (stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                     state = TelephonyManager.CALL_STATE_IDLE;
@@ -173,7 +175,7 @@ public class RecService extends Service {
     }
 
     public class CallReceiver extends PhonecallReceiver {
-        private RecFile recFile;
+        private File file;
 
         @Override
         protected void onIncomingCallReceived(Context ctx, String number) {
@@ -209,15 +211,18 @@ public class RecService extends Service {
             String fileName = DateFormat.format(getString(R.string.date_time_format), new Date()) +
                     "_" + callAction + "." + "mp3";
 
-            File root = new File(context.getFilesDir().getAbsolutePath() + PATH);
+            File root = new File(context.getFilesDir().getAbsolutePath());
 //            Log.d("L_FileName", root + fileName);
             if (!(root).exists()) {
-                if (root.mkdirs()){
-
-                }
+                root.mkdir();
             }
-            recFile = new RecFile(root, fileName);
-            recording = new Recording(recFile);
+            file = new File(root, fileName);
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            recording = new Recording(file);
             recording.startRecCommunication(context);
         }
 
@@ -226,7 +231,7 @@ public class RecService extends Service {
                 recording.stopRecording();
                 recording = null;
 
-                List<String> aye = Arrays.asList(new File(context.getFilesDir().getAbsolutePath() + PATH).list());
+                List<String> aye = Arrays.asList(new File(context.getFilesDir().getAbsolutePath()).list());
                 for (int i = 0; i < aye.size(); i++) {
                     if (aye.get(i).split("mp3").length > 0) {
                         UploadFile(context, aye.get(i));
@@ -250,7 +255,7 @@ public class RecService extends Service {
             }
 
             final String filenam = filename;
-            final File file = new File(context.getFilesDir().getAbsolutePath() + PATH + filenam);
+            final File file = new File(context.getFilesDir().getAbsolutePath(), filenam);
             final Uri resultUri = Uri.fromFile(file);
 
             StorageReference mStorageRefImage = FirebaseStorage.getInstance().getReference().child(filenam);

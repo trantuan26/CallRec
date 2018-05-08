@@ -13,10 +13,10 @@ import java.io.IOException;
 
 public class Recording extends MediaRecorder {
     private boolean isStarted = false;
-    private RecFile recFile;
+    private File file;
 
-    public Recording(RecFile recFile) {
-        this.recFile = recFile;
+    public Recording(File file) {
+        this.file = file;
     }
 
     public void startRecording() {
@@ -24,7 +24,7 @@ public class Recording extends MediaRecorder {
         this.setAudioEncoder(AudioEncoder.AAC);
 //        this.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 //        this.setAudioEncodingBitRate(64000);
-        this.setOutputFile(recFile.getAbsolutePath());
+        this.setOutputFile(file.getAbsolutePath());
         try {
             this.prepare();
         } catch (IllegalStateException e) {
@@ -54,9 +54,9 @@ public class Recording extends MediaRecorder {
 //set volume to maximum
 //        audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL), 0);
 
-        this.setAudioSource(AudioSource.UNPROCESSED);
+        this.setAudioSource(AudioSource.VOICE_COMMUNICATION);
 
-        this.setAudioChannels(2);
+//        this.setAudioChannels(2);
         this.startRecording();
     }
 

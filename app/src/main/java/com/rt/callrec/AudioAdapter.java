@@ -81,8 +81,10 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     //Log.d("aaa", "onBindViewHolder: " + snapshot.getValue());
-                    audio.setUserName(snapshot.getValue().toString());
-                    viewHolder.song_artist.setText(snapshot.getValue().toString());
+                    if (snapshot.getValue() != null){
+                        audio.setUserName(snapshot.getValue().toString());
+                        viewHolder.song_artist.setText(snapshot.getValue().toString());
+                    }
                 }
 
                 @Override

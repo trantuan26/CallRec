@@ -111,13 +111,7 @@ public class ListAudioActivity extends AppCompatActivity {
         progressDialog.setMessage("Please wait, is loading..");
         progressDialog.show();
         listAudio.clear();
-        FirebaseUser user = mAuth.getCurrentUser();
-        String onlineUserID="";
-        if (user != null){
-            onlineUserID = user.getUid();
-        }
 
-        final String finalOnlineUserID = onlineUserID;
         mDatabaseReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -127,14 +121,16 @@ public class ListAudioActivity extends AppCompatActivity {
                 //Log.d("onChildAdded", "dataSnapshot: " + new Gson().toJson(audio));
                 //Log.d("onChildAdded", "dataSnapshot: " + dataSnapshot.getKey());
 
-                if (finalOnlineUserID.equals(audio.getAdminID())){
-                    listAudio.add(0, audio);
-                    audioAdapter.ChangeList(listAudio);
-                }
+
+                listAudio.add(0, audio);
+                audioAdapter.ChangeList(listAudio);
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        progressDialog.dismiss();
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
                     }
                 }, 600);
 
@@ -142,8 +138,7 @@ public class ListAudioActivity extends AppCompatActivity {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                if (progressDialog != null)
-                    progressDialog.dismiss();
+
             }
 
             @Override
@@ -158,11 +153,13 @@ public class ListAudioActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                if (progressDialog != null)
+                if (progressDialog.isShowing()) {
                     progressDialog.dismiss();
+                }
             }
         });
     }
+
 
     private void ActionBar() {
         mToolbar = findViewById(R.id.toolbar);
@@ -202,7 +199,7 @@ public class ListAudioActivity extends AppCompatActivity {
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-     searchView = (SearchView) menu.findItem(R.id.action_search)
+        searchView = (SearchView) menu.findItem(R.id.action_search)
                 .getActionView();
         searchView.setSearchableInfo(searchManager
                 .getSearchableInfo(getComponentName()));

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -65,6 +66,11 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        progressDialog = new ProgressDialog(getActivity());
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,6 +84,7 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
         btnSignOut = view.findViewById(R.id.btn_signout);
         btnAdmin = view.findViewById(R.id.btn_admin);
 
+
         mAuth = FirebaseAuth.getInstance();
 
 
@@ -85,7 +92,8 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
             FirebaseUser User = mAuth.getCurrentUser();
             if (User != null) {
                 SetUI(User);
-                if (User.getUid().equals("hxwTmdVFVkS9wuoF0FwLFssu2L13")) {
+                //if (User.getUid().equals("hxwTmdVFVkS9wuoF0FwLFssu2L13"))
+                {
                     btnAdmin.setVisibility(View.VISIBLE);
                 }
             }
@@ -102,7 +110,7 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
         tvName.setVisibility(View.VISIBLE);
         tvEmail.setVisibility(View.VISIBLE);
         btnSignOut.setVisibility(View.VISIBLE);
-        btnAdmin.setVisibility(View.INVISIBLE);
+        btnAdmin.setVisibility(View.VISIBLE);
 
         Picasso.with(getContext())
                 .load(User.getPhotoUrl())
@@ -143,12 +151,10 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
 
                 break;
             case R.id.btn_admin:
-//                List<String> aye = Arrays.asList(new File(getContext().getFilesDir().getAbsolutePath()).list());
-//                for (int i = 0; i < aye.size(); i++){
-//                    if(aye.get(i).split("mp3").length > 0) {
-//                        UploadFile(aye.get(i));
-//                    }
-//                }
+//
+                progressDialog.setTitle("List Recording");
+                progressDialog.setMessage("Please wait, is loading..");
+                progressDialog.show();
                 Intent mainIntent = new Intent(getActivity(), ListAudioActivity.class);
                 startActivity(mainIntent);
                 break;
@@ -158,5 +164,21 @@ public class AccountsFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (progressDialog.isShowing()){
+            progressDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (progressDialog.isShowing()){
+            progressDialog.dismiss();
+        }
     }
 }

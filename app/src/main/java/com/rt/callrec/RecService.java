@@ -270,7 +270,7 @@ public class RecService extends Service {
                         messageBody.put("fileName", filenam);
                         messageBody.put("mUri", downloadUrl);
                         messageBody.put("userID", finalFirebaseUserId);
-                        messageBody.put("adminID", "hxwTmdVFVkS9wuoF0FwLFssu2L13");
+                        messageBody.put("adminID", finalFirebaseUserId);
 
 
                         databaseReference.updateChildren(messageBody, new DatabaseReference.CompletionListener() {

@@ -56,7 +56,7 @@ public class ListAudioActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
 
-    private AudioAdapter audioAdapter;
+    private AdminAudioAdapter audioAdapter;
 
 
     private Toolbar mToolbar;
@@ -77,7 +77,7 @@ public class ListAudioActivity extends AppCompatActivity {
 
         if (listAudio == null) {
             listAudio = new ArrayList<>();
-            audioAdapter = new AudioAdapter(listAudio, this);
+            audioAdapter = new AdminAudioAdapter(listAudio, this);
             recyclerView.setHasFixedSize(true);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(layoutManager);

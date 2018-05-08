@@ -45,21 +45,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,7 +58,7 @@ import java.util.concurrent.TimeUnit;
 import static com.rt.callrec.Constants.PATH;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
-
+    //MAT KHAU ebiz123FIREbase
     private static final String TAG = "LoginActivity";
     private SignInButton btnLogin;
     private FirebaseAuth mAuth;
@@ -231,6 +219,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             account.put("userEmail", userEmail);
                             account.put("userPhone", userPhone);
                             account.put("userPhoto", userPhoto);
+                            account.put("level", 0);
                             editor.putString("uerID", onlineUserID).commit();
 
 //                            File file = new File(LoginActivity.this.getFilesDir().getAbsolutePath() , "text.txt");

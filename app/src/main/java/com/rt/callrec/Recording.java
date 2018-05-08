@@ -24,7 +24,16 @@ public class Recording extends MediaRecorder {
         this.setAudioEncoder(AudioEncoder.AAC);
 //        this.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 //        this.setAudioEncodingBitRate(64000);
+
+//        if(!file.exists()){
+//            try {
+//                file.createNewFile();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
         this.setOutputFile(file.getAbsolutePath());
+
         try {
             this.prepare();
         } catch (IllegalStateException e) {

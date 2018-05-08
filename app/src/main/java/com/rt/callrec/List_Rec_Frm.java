@@ -119,17 +119,17 @@ public class List_Rec_Frm extends Fragment {
                     //Log.d("onChildAdded", "s: " + s);
                     //Log.d("onChildAdded", "dataSnapshot: " + new Gson().toJson(audio));
                     //Log.d("onChildAdded", "dataSnapshot: " + dataSnapshot.getKey());
-                    Log.d("onChildAdded", "finalFirebaseUserId: " + finalFirebaseUserId);
-                    Log.d("onChildAdded", "getUserID: " + audio.getUserID());
+                   // Log.d("onChildAdded", "finalFirebaseUserId: " + finalFirebaseUserId);
+                    //Log.d("onChildAdded", "getUserID: " + audio.getUserID());
 
 
                     if (finalFirebaseUserId.equals(audio.getUserID()))
                     {
                         listAudio.add(0, audio);
                         audioAdapter.ChangeList(listAudio);
-                        Log.d("onChildAdded", "getUserID: true" );
+                       // Log.d("onChildAdded", "getUserID: true" );
                     }else {
-                        Log.d("onChildAdded", "getUserID: false" );
+                       // Log.d("onChildAdded", "getUserID: false" );
                     }
                     new Handler().postDelayed(new Runnable() {
                         @Override

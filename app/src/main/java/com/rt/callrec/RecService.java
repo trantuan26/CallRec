@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.IBinder;
@@ -33,6 +35,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +56,7 @@ public class RecService extends Service {
     private FirebaseAuth mAuth;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    public final static String EXTRA_PHONE_CALL = "GIATRI";
 
     @Nullable
     @Override
@@ -62,12 +66,10 @@ public class RecService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_OUT);
-        filter.addAction(ACTION_IN);
-        this.registerReceiver(new CallReceiver(), filter);
-//        return super.onStartCommand(intent, flags, startId);
-        return START_REDELIVER_INTENT;
+        String callAction = intent.getStringExtra("callAction");
+        String number = intent.getStringExtra("number");
+        startRecording(getApplicationContext(), callAction, number);
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -78,6 +80,7 @@ public class RecService extends Service {
         editor = sharedPreferences.edit();
     }
 
+<<<<<<< HEAD
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -119,61 +122,42 @@ public class RecService extends Service {
                 onCallStateChanged(context, state, number);
             }
         }
+=======
+>>>>>>> c370dc21730ba5ab099611612eb2536c970a1117
 
-        //Derived classes should override these to respond to specific events of interest
-        protected abstract void onIncomingCallReceived(Context ctx, String number);
 
-        protected abstract void onIncomingCallAnswered(Context ctx, String number);
+    MediaRecorder mediaRecorder;
+    boolean isRecording = false;
 
-        protected abstract void onIncomingCallEnded(Context ctx);
+    private void startRecording(Context context, String callAction, String number) {
+        if (!isRecording) {
+            isRecording = true;
 
-        protected abstract void onOutgoingCallStarted(Context ctx, String number);
-
-        protected abstract void onOutgoingCallEnded(Context ctx);
-
-        protected abstract void onMissedCall(Context ctx, String number);
-
-        //Deals with actual events
-
-        //Incoming call-  goes from IDLE to RINGING when it rings, to OFFHOOK when it's answered, to IDLE when its hung up
-        //Outgoing call-  goes from IDLE to OFFHOOK when it dials out, to IDLE when hung up
-        public void onCallStateChanged(Context context, int state, String number) {
-            if (lastState == state) {
-                //No change, debounce extras
-                return;
+            File file = null;
+            try {
+                String fileName = number+ DateFormat.format(getString(R.string.date_time_format), new Date()) +
+                        "_" + callAction;
+                File dir = new File(context.getFilesDir().getAbsolutePath());
+                mediaRecorder = new MediaRecorder();
+                file = File.createTempFile(fileName, ".mp3", dir);
+                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.VOICE_CALL);
+                mediaRecorder.setAudioSamplingRate(8000);
+                mediaRecorder.setAudioEncodingBitRate(12200);
+                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
+                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+                mediaRecorder.setOutputFile(file.getAbsolutePath());
+                mediaRecorder.prepare();
+                mediaRecorder.start();
+                Toast.makeText(context,"start record",Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (file != null) file.delete();
+                isRecording = false;
             }
-            switch (state) {
-                case TelephonyManager.CALL_STATE_RINGING:
-                    isIncoming = true;
-                    savedNumber = number;
-                    onIncomingCallReceived(context, number);
-                    break;
-                case TelephonyManager.CALL_STATE_OFFHOOK:
-                    //Transition of ringing->offhook are pickups of incoming calls.  Nothing done on them
-                    if (lastState != TelephonyManager.CALL_STATE_RINGING) {
-                        isIncoming = false;
-                        onOutgoingCallStarted(context, savedNumber);
-                    } else {
-                        isIncoming = true;
-                        onIncomingCallAnswered(context, savedNumber);
-                    }
-                    break;
-                case TelephonyManager.CALL_STATE_IDLE:
-                    //Went to idle-  this is the end of a call.  What type depends on previous state(s)
-                    if (lastState == TelephonyManager.CALL_STATE_RINGING) {
-                        //Ring but no pickup-  a miss
-                        onMissedCall(context, savedNumber);
-                    } else if (isIncoming) {
-                        onIncomingCallEnded(context);
-                    } else {
-                        onOutgoingCallEnded(context);
-                    }
-                    break;
-            }
-            lastState = state;
         }
     }
 
+<<<<<<< HEAD
     public class CallReceiver extends PhonecallReceiver {
         private File file;
 
@@ -217,76 +201,100 @@ public class RecService extends Service {
             try {
                 file = File.createTempFile(fileName,".mp3",root);
             } catch (IOException e) {
+=======
+    private void stopRecording(Context context) {
+        if (isRecording) {
+            try {
+                mediaRecorder.stop();
+                mediaRecorder.reset();
+                mediaRecorder.release();
+                mediaRecorder = null;
+                isRecording = false;
+                Toast.makeText(context,"stop record",Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+>>>>>>> c370dc21730ba5ab099611612eb2536c970a1117
                 e.printStackTrace();
             }
-            recording = new Recording(file);
-            recording.startRecCommunication(context);
+//            List<String> aye = Arrays.asList(new File(context.getFilesDir().getAbsolutePath()).list());
+//            for (int i = 0; i < aye.size(); i++) {
+//                if (aye.get(i).split("mp3").length > 0) {
+//                    UploadFile(context, aye.get(i));
+//                }
+//            }
         }
+    }
 
-        private void endRecording(Context context) {
-            if (recording != null) {
-                recording.stopRecording();
-                recording = null;
+    @Override
+    public void onDestroy() {
+        stopRecording(getApplicationContext());
+        super.onDestroy();
+    }
 
-                List<String> aye = Arrays.asList(new File(context.getFilesDir().getAbsolutePath()).list());
-                for (int i = 0; i < aye.size(); i++) {
-                    if (aye.get(i).split("mp3").length > 0) {
-                        UploadFile(context, aye.get(i));
-                    }
-                }
+    private void UploadFile(Context context, String filename) {
+        //cap nhat anh vao store
+        mAuth = FirebaseAuth.getInstance();
+        String firebaseUserId = "";
+
+        if (mAuth != null) {
+            FirebaseUser User = mAuth.getCurrentUser();
+            if (User != null) {
+                firebaseUserId = User.getUid().toString();
+            } else {
+                firebaseUserId = sharedPreferences.getString("uerID", "");
             }
         }
 
-        private void UploadFile(Context context, String filename) {
-            //cap nhat anh vao store
-            mAuth = FirebaseAuth.getInstance();
-            String firebaseUserId = "";
+        final String filenam = filename;
+        final File file = new File(context.getFilesDir().getAbsolutePath(), filenam);
+        final Uri resultUri = Uri.fromFile(file);
 
-            if (mAuth != null) {
-                FirebaseUser User = mAuth.getCurrentUser();
-                if (User != null) {
-                    firebaseUserId = User.getUid().toString();
-                } else {
-                    firebaseUserId = sharedPreferences.getString("uerID", "");
-                }
-            }
-
-            final String filenam = filename;
-            final File file = new File(context.getFilesDir().getAbsolutePath(), filenam);
-            final Uri resultUri = Uri.fromFile(file);
-
-            StorageReference mStorageRefImage = FirebaseStorage.getInstance().getReference().child(filenam);
-            final String finalFirebaseUserId = firebaseUserId;
-            mStorageRefImage.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        final String downloadUrl = task.getResult().getDownloadUrl().toString();
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("reccall").push();
-                        Map messageBody = new HashMap();
-                        messageBody.put("fileName", filenam);
-                        messageBody.put("mUri", downloadUrl);
-                        messageBody.put("userID", finalFirebaseUserId);
-                        messageBody.put("adminID", finalFirebaseUserId);
+        StorageReference mStorageRefImage = FirebaseStorage.getInstance().getReference().child(filenam);
+        final String finalFirebaseUserId = firebaseUserId;
+        mStorageRefImage.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    final String downloadUrl = task.getResult().getDownloadUrl().toString();
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("reccall").push();
+                    Map messageBody = new HashMap();
+                    messageBody.put("fileName", filenam);
+                    messageBody.put("mUri", downloadUrl);
+                    messageBody.put("userID", finalFirebaseUserId);
+                    messageBody.put("adminID", finalFirebaseUserId);
 
 
-                        databaseReference.updateChildren(messageBody, new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                if (databaseError != null) {
-                                    Log.d("TAG", "onComplete: databaseError");
-                                }
+                    databaseReference.updateChildren(messageBody, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if (databaseError != null) {
+                                Log.d("TAG", "onComplete: databaseError");
                             }
-                        });
+                        }
+                    });
 
-                        file.delete();
+                    file.delete();
 
-                    } else {
+                } else {
 //                        Toast.makeText(getContext(), "update picture faile", Toast.LENGTH_LONG).show();
-                    }
-
                 }
-            });
-        }
+
+            }
+        });
+    }
+
+
+
+
+    public static void startService(Context context,String callAction, String number) {
+        Intent intent = new Intent(context, RecService.class);
+        intent.putExtra("callAction", callAction);
+        intent.putExtra("number", number);
+        context.startService(intent);
+    }
+
+
+    public static void stopService(Context context) {
+        Intent intent = new Intent(context, RecService.class);
+        context.stopService(intent);
     }
 }

@@ -5,7 +5,10 @@
     <permission android:name="jp.co.abc.android.OMRSSettings.permission.Access"
         android:protectionLevel="signature"></permission>
 
+<<<<<<< HEAD
     <uses-permission android:name="jp.co.abc.android.OMRSSettings.permission.Access" />
+=======
+>>>>>>> c370dc21730ba5ab099611612eb2536c970a1117
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -34,6 +37,12 @@
             android:name=".StartReceiver"
             android:enabled="true"
             android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />

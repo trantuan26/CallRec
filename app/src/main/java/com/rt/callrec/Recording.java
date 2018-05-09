@@ -20,28 +20,20 @@ public class Recording extends MediaRecorder {
     }
 
     public void startRecording() {
-        this.setOutputFormat(OutputFormat.AAC_ADTS);
-        this.setAudioEncoder(AudioEncoder.AAC);
-//        this.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-//        this.setAudioEncodingBitRate(64000);
-
-//        if(!file.exists()){
-//            try {
-//                file.createNewFile();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-        this.setOutputFile(file.getAbsolutePath());
-
         try {
+            this.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
+            this.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            this.setAudioSamplingRate(8000);
+            this.setAudioEncodingBitRate(12200);
+            this.setOutputFile(file.getAbsolutePath());
             this.prepare();
+            this.start();
         } catch (IllegalStateException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.start();
+
         isStarted = true;
     }
 
@@ -63,7 +55,7 @@ public class Recording extends MediaRecorder {
 //set volume to maximum
 //        audioManager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audioManager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL), 0);
 
-        this.setAudioSource(AudioSource.VOICE_COMMUNICATION);
+        this.setAudioSource(AudioSource.MIC);
 
 //        this.setAudioChannels(2);
         this.startRecording();

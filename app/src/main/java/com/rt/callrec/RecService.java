@@ -102,11 +102,11 @@ public class RecService extends Service {
 //            String mPhoneNumber = tMgr.getLine1Number();
 
             if (intent.getAction().equals(ACTION_OUT)) {
-//                savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
+                savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
             } else {
                 String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
-//                String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
-                String number = "";
+                String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
+
                 int state = 0;
                 if (stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                     state = TelephonyManager.CALL_STATE_IDLE;
@@ -208,17 +208,14 @@ public class RecService extends Service {
         }
 
         private void startRecording(Context context, String callAction, String number) {
-            String fileName = DateFormat.format(getString(R.string.date_time_format), new Date()) +
-                    "_" + callAction + "." + "mp3";
+            String fileName = number + DateFormat.format(getString(R.string.date_time_format), new Date()) +
+                    "_" + callAction +".mp3";
 
             File root = new File(context.getFilesDir().getAbsolutePath());
-//            Log.d("L_FileName", root + fileName);
-            if (!(root).exists()) {
-                root.mkdir();
-            }
-            file = new File(root, fileName);
+
+            file = null;
             try {
-                file.createNewFile();
+                file = File.createTempFile(fileName,".mp3",root);
             } catch (IOException e) {
                 e.printStackTrace();
             }

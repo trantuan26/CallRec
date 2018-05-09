@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.rt.callrec">
+    <permission android:name="jp.co.abc.android.OMRSSettings.permission.Access"
+        android:protectionLevel="signature"></permission>
 
-    <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
-        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="jp.co.abc.android.OMRSSettings.permission.Access" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
